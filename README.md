@@ -4,9 +4,9 @@ A comprehensive web application that combines **React frontend** with **FastAPI 
 
 ## 🌟 Features Overview
 
-### 🎨 **Dual Interface Options**
-- **⚛️ Modern React Frontend** - Sleek, responsive UI with real-time updates and animations
-- **🌐 Classic Vanilla Interface** - Traditional HTML/JS interface for maximum compatibility
+### 🎨 **Modern React Frontend**
+- **⚛️ Sleek, responsive UI** - Built with React 18, Tailwind CSS, and Framer Motion
+- **🌐 Real-time updates** - Live scraping progress and typing indicators via Socket.IO
 
 ### 🚀 **Core Capabilities**
 - **Advanced Website Scraping** - Multi-depth crawling with configurable parameters
@@ -114,16 +114,15 @@ setup.bat
 
 Once running, access the application at:
 
-- **🏠 Main Interface**: http://localhost:8000
-- **⚛️ React Frontend**: http://localhost:8000/react
-- **🌐 Vanilla Interface**: http://localhost:8000/vanilla
+- **🏠 React Frontend**: http://localhost:8000
+- **⚛️ React App (alias)**: http://localhost:8000/react
 - **📚 API Documentation**: http://localhost:8000/api/docs
 - **💊 Health Check**: http://localhost:8000/api/health
 
 ## 🎯 How to Use
 
-### 1. **Choose Your Interface**
-Visit http://localhost:8000 to select between React or Vanilla interface.
+### 1. **Access the React Interface**
+Visit http://localhost:8000 to access the modern React frontend.
 
 ### 2. **Configure Website Scraping**
 - Enter a website URL
@@ -335,20 +334,19 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - **[ESLint](https://eslint.org/)** - Code linting
 - **[Prettier](https://prettier.io/)** - Code formatting
 
-## 📊 Features Comparison
+## 📊 React Frontend Features
 
-| Feature | React Frontend | Vanilla Interface |
-|---------|----------------|-------------------|
-| **UI Design** | Modern, Animated | Classic, Functional |
-| **Real-time Updates** | ✅ Socket.IO | ✅ Socket.IO |
-| **Mobile Responsive** | ✅ Optimized | ✅ Basic |
-| **Chat Streaming** | ✅ Advanced | ✅ Basic |
-| **Markdown Support** | ✅ Full | ✅ Basic |
-| **Syntax Highlighting** | ✅ Advanced | ❌ |
-| **PWA Support** | ✅ Full | ❌ |
-| **Accessibility** | ✅ Enhanced | ✅ Basic |
-| **Load Time** | Fast (cached) | Instant |
-| **Customization** | ✅ Extensive | ✅ Limited |
+| Feature | Status | Description |
+|---------|--------|-------------|
+| **UI Design** | ✅ Modern, Animated | Built with React 18, Tailwind CSS, Framer Motion |
+| **Real-time Updates** | ✅ Socket.IO | Live scraping progress and typing indicators |
+| **Mobile Responsive** | ✅ Optimized | Touch-friendly interface with adaptive layout |
+| **Chat Streaming** | ✅ Advanced | Real-time AI response streaming |
+| **Markdown Support** | ✅ Full | Rich text formatting with ReactMarkdown |
+| **Syntax Highlighting** | ✅ Advanced | Code blocks with syntax highlighting |
+| **PWA Support** | ✅ Full | Installable with offline capabilities |
+| **Accessibility** | ✅ Enhanced | WCAG compliant design |
+| **Customization** | ✅ Extensive | Tailwind CSS theming system |
 
 ## 🎯 Roadmap
 

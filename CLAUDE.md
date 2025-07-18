@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a RAG (Retrieval-Augmented Generation) web application with a **React frontend** and **FastAPI backend**. The application scrapes websites, stores content in FAISS vector store, and provides AI-powered chat using Google Gemini 2.5 Flash with real-time updates via Socket.IO.
+This is a RAG (Retrieval-Augmented Generation) web application with a **React-only frontend** and **FastAPI backend**. The application scrapes websites, stores content in FAISS vector store, and provides AI-powered chat using Google Gemini 2.5 Flash with real-time updates via Socket.IO.
 
 ## Architecture
 
@@ -118,9 +118,8 @@ GET  /api/health          # Health check
 - `npm run eject` - Eject from Create React App (not recommended)
 
 ### Backend Entry Points
-- `http://localhost:8000` - Main interface (route selector)
-- `http://localhost:8000/react` - React frontend
-- `http://localhost:8000/vanilla` - Vanilla HTML interface
+- `http://localhost:8000` - React frontend (main interface)
+- `http://localhost:8000/react` - React frontend (alias)
 - `http://localhost:8000/api/docs` - FastAPI documentation
 
 ### Testing & Debugging
