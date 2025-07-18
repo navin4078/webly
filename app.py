@@ -14,7 +14,6 @@ from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -74,11 +73,8 @@ app.add_middleware(
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins="*")
 socket_app = socketio.ASGIApp(sio, app)
 
-# Templates
-templates = Jinja2Templates(directory="templates")
-
 # Create directories
-for directory in ["templates", "uploads", "vector_store", "crawl_results", "junk"]:
+for directory in ["uploads", "vector_store", "crawl_results"]:
     Path(directory).mkdir(exist_ok=True)
 
 # Mount React build
@@ -150,35 +146,35 @@ async def ping(sid):
 
 # MAIN ROUTES
 @app.get("/", response_class=HTMLResponse)
-async def root(request: Request):
+async def root():
     """Redirect to React app"""
-    return templates.TemplateResponse("index.html", {"request": request})
-
-@app.get("/react", response_class=HTMLResponse)
-async def react_app(request: Request):
-    """Serve React application"""
     if not REACT_AVAILABLE:
         return HTMLResponse(
             content="""
             <html>
-                <head><title>React App Not Available</title></head>
+                <head><title>RAG Chat - React App</title></head>
                 <body style="font-family: Arial, sans-serif; text-align: center; padding: 2rem;">
-                    <h1>⚠️ React Frontend Not Available</h1>
-                    <p>Please build the React app first:</p>
+                    <h1>🤖 RAG Chat</h1>
+                    <p>⚠️ React frontend not available. Please build the React app first:</p>
                     <pre style="background: #333; color: white; padding: 1rem; border-radius: 8px;">
-cd frontend
-npm run build</pre>
+cd frontend && npm run build</pre>
                 </body>
             </html>
             """,
             status_code=503
         )
     
+    # Serve React app directly
     react_index = react_build_path / "index.html"
     if react_index.exists():
         return FileResponse(react_index)
     else:
         raise HTTPException(status_code=404, detail="React app not found")
+
+@app.get("/react", response_class=HTMLResponse)
+async def react_app():
+    """Alias for root route - serve React application"""
+    return await root()
 
 # Serve React assets
 @app.get("/manifest.json")

@@ -81,3 +81,6 @@ crawl_results/
 # Temporary files
 *.tmp
 *.temp
+
+# Removed directories
+templates/
