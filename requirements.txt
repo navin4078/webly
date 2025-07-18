@@ -1,0 +1,63 @@
+# FastAPI Web Application Requirements - Enhanced for Real-time RAG
+
+# Core FastAPI with WebSocket support
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+websockets>=12.0
+python-socketio>=5.11.2
+python-multipart>=0.0.9
+
+# Static files and templates
+jinja2>=3.1.4
+aiofiles>=24.1.0
+
+# Core dependencies
+python-dotenv>=1.0.0
+numpy>=1.26.0
+pydantic>=2.7.0
+
+# LangChain ecosystem - Compatible versions
+langchain>=0.3.17
+langchain-core>=0.3.34
+langchain-community>=0.3.17
+langchain-google-genai>=2.0.5
+
+# LangGraph for conversation memory
+langgraph>=0.2.58
+langgraph-checkpoint>=2.0.7
+
+# Vector store and embeddings
+faiss-cpu>=1.8.0
+sentence-transformers>=3.3.1
+
+# Advanced web scraping - ENHANCED 2025 STACK
+# Async HTTP client for high-performance scraping
+aiohttp>=3.9.5
+httpx>=0.27.0
+
+# Advanced user agent rotation and anti-detection
+fake-useragent>=1.5.1
+requests>=2.31.0
+
+# HTML parsing and processing
+beautifulsoup4>=4.12.2
+lxml>=4.9.3
+
+# Additional scraping utilities
+urllib3>=2.0.7
+charset-normalizer>=3.3.2
+
+# Session management and security
+python-jose>=3.3.0
+passlib>=1.7.4
+
+# Python 3.12 compatibility fixes
+setuptools>=69.0.0
+wheel>=0.42.0
+
+# Logging and monitoring
+colorlog>=6.8.0
+
+# Development dependencies (optional)
+pytest>=8.2.0
+pytest-asyncio>=0.23.0

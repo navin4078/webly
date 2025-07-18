@@ -1,0 +1,59 @@
+{
+  "short_name": "RAG Chat",
+  "name": "RAG Chat - React + FastAPI Enhanced",
+  "description": "AI-Powered Website Intelligence with Real-time Communication",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["productivity", "utilities", "education"],
+  "shortcuts": [
+    {
+      "name": "Start Scraping",
+      "short_name": "Scrape",
+      "description": "Start scraping a new website",
+      "url": "/?action=scrape",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Chat",
+      "short_name": "Chat",
+      "description": "Chat with scraped content",
+      "url": "/?action=chat",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-wide.png",
+      "type": "image/png",
+      "sizes": "1280x720",
+      "form_factor": "wide"
+    },
+    {
+      "src": "screenshot-narrow.png",
+      "type": "image/png",
+      "sizes": "640x1136",
+      "form_factor": "narrow"
+    }
+  ]
+}

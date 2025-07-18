@@ -1,0 +1,15 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://rag-chat.example.com/sitemap.xml
+
+# Crawl delay for polite scraping
+Crawl-delay: 1
+
+# Allow all bots to access the main app
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/static/
+Disallow: /socket.io/
