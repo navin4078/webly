@@ -585,17 +585,20 @@ async def internal_error_handler(request: Request, exc):
 if __name__ == "__main__":
     import uvicorn
     
+    # Get port from environment variable (Railway sets this)
+    port = int(os.environ.get("PORT", 8000))
+    
     logger.info("=" * 60)
     logger.info("🚀 Starting RAG Chat - React + FastAPI")
-    logger.info("📱 Main Interface: http://localhost:8000")
-    logger.info("⚛️  React App: http://localhost:8000/react")
-    logger.info("🧪 API Docs: http://localhost:8000/api/docs")
-    logger.info("💊 Health: http://localhost:8000/api/health")
+    logger.info(f"📱 Main Interface: http://0.0.0.0:{port}")
+    logger.info(f"⚛️  React App: http://0.0.0.0:{port}/react")
+    logger.info(f"🧪 API Docs: http://0.0.0.0:{port}/api/docs")
+    logger.info(f"💊 Health: http://0.0.0.0:{port}/api/health")
     if not REACT_AVAILABLE:
         logger.info("💡 To enable React: cd frontend && npm run build")
     logger.info("=" * 60)
     
     try:
-        uvicorn.run(socket_app, host="0.0.0.0", port=8000, log_level="info")
+        uvicorn.run(socket_app, host="0.0.0.0", port=port, log_level="info")
     except Exception as e:
         logger.error(f"Failed to start server: {e}")
