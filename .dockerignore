@@ -1,0 +1,48 @@
+# Node.js
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Development files
+.git/
+.gitignore
+README.md
+frontend/README.md
+.env
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.log
+uploads/
+vector_store/
+crawl_results/
+
+# OS
+.DS_Store
+Thumbs.db

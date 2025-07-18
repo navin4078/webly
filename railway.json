@@ -1,7 +1,7 @@
 {
   "build": {
     "builder": "nixpacks",
-    "buildCommand": "cd frontend && npm install && npm run build && cd .."
+    "buildCommand": "cd frontend && npm install && npm run build && rm -rf node_modules && cd .."
   },
   "deploy": {
     "startCommand": "python app.py",
