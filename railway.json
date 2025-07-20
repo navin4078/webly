@@ -1,10 +1,8 @@
 {
   "build": {
-    "builder": "nixpacks",
-    "buildCommand": "cd frontend && npm install && npm run build && rm -rf node_modules && cd .."
+    "builder": "dockerfile"
   },
   "deploy": {
-    "startCommand": "python app.py",
     "healthcheckPath": "/api/health"
   }
 }
