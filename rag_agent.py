@@ -20,16 +20,15 @@ import xml.etree.ElementTree as ET
 
 # LangChain imports - UPDATED FOR CURRENT VERSION
 from langchain_community.document_loaders import WebBaseLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAI
-from langchain.chains import create_retrieval_chain, create_history_aware_retriever
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain.embeddings.base import Embeddings
-from langchain_core.messages import HumanMessage, AIMessage
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain.schema import LLMResult
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.embeddings import Embeddings
+from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+from langchain_core.language_models import BaseLanguageModel
+from langchain_core.callbacks import BaseCallbackHandler
 
 # LangGraph imports for modern conversation memory
 from langgraph.graph import StateGraph, MessagesState, START, END
@@ -828,26 +827,44 @@ class WebScraperRAGAgentWithMemory:
         
         print("🎉 RAG agent with conversation memory is ready!")
         
+    def _contextualize_input(self, input_dict, contextualize_q_prompt):
+        """Contextualize the input question using chat history"""
+        if input_dict.get("chat_history"):
+            chain = contextualize_q_prompt | self.llm
+            contextualized_question = chain.invoke(input_dict)
+            if hasattr(contextualized_question, 'content'):
+                return contextualized_question.content
+            return str(contextualized_question)
+        return input_dict.get("input", "")
+
     def _create_conversational_rag_chain(self):
         """
         Create a conversation-aware RAG chain using LangChain's history-aware retriever
         """
         print("🔗 Creating conversation-aware RAG chain...")
-        
+
         # 1. Create a history-aware retriever
         contextualize_q_system_prompt = """Given a chat history and the latest user question \
 which might reference context in the chat history, formulate a standalone question \
 which can be understood without the chat history. Do NOT answer the question, \
 just reformulate it if needed and otherwise return it as is."""
-        
+
         contextualize_q_prompt = ChatPromptTemplate.from_messages([
             ("system", contextualize_q_system_prompt),
             MessagesPlaceholder("chat_history"),
             ("human", "{input}"),
         ])
-        
-        self.history_aware_retriever = create_history_aware_retriever(
-            self.llm, self.vector_store.as_retriever(search_kwargs={"k": 6}), contextualize_q_prompt
+
+        # Create a history-aware retriever manually using runnables
+        # This replaces the deprecated create_history_aware_retriever function
+        def get_contextualized_query(x):
+            return self._contextualize_input(x, contextualize_q_prompt) if x.get("chat_history") else x.get("input", "")
+
+        # Create the retriever with history awareness
+        self.history_aware_retriever = RunnablePassthrough.assign(
+            context=lambda x: self.vector_store.as_retriever(search_kwargs={"k": 6}).invoke(
+                get_contextualized_query(x)
+            )
         )
         
         # 2. Enhanced question-answering chain with citations for source extraction
@@ -887,14 +904,35 @@ Context pieces with sources:
             MessagesPlaceholder("chat_history"),
             ("human", "{input}"),
         ])
-        
-        self.question_answer_chain = create_stuff_documents_chain(self.llm, qa_prompt)
-        
-        # 3. Create the full RAG chain
-        self.rag_chain = create_retrieval_chain(
-            self.history_aware_retriever, 
-            self.question_answer_chain
+
+        # Create a stuff documents chain manually (replaces deprecated create_stuff_documents_chain)
+        def format_docs(docs):
+            """Format documents as context for the prompt"""
+            formatted_docs = []
+            for doc in docs:
+                formatted_docs.append(f"Source: {doc.metadata.get('source', 'Unknown')}\n{doc.page_content}")
+            return "\n\n".join(formatted_docs)
+
+        self.question_answer_chain = (
+            {"context": lambda x: format_docs(x.get("context", [])), "input": lambda x: x.get("input", ""), "chat_history": lambda x: x.get("chat_history", [])}
+            | qa_prompt
+            | self.llm
         )
+
+        # 3. Create the full RAG chain manually (replaces deprecated create_retrieval_chain)
+        def retrieve_context(input_dict):
+            """Retrieve context using the history-aware retriever"""
+            query = input_dict.get("input", "")
+            if input_dict.get("chat_history"):
+                contextualized = self._contextualize_input(input_dict, contextualize_q_prompt)
+                docs = self.vector_store.as_retriever(search_kwargs={"k": 6}).invoke(contextualized)
+            else:
+                docs = self.vector_store.as_retriever(search_kwargs={"k": 6}).invoke(query)
+            return {"context": docs, "input": query, "chat_history": input_dict.get("chat_history", [])}
+
+        self.rag_chain = RunnablePassthrough.assign(
+            context=lambda x: retrieve_context(x)["context"]
+        ) | self.question_answer_chain
         
         print("✅ Enhanced conversation-aware RAG chain with citations created!")
     
@@ -994,9 +1032,17 @@ Content: {content}
                     "input": user_input,
                     "chat_history": chat_history
                 })
-                
+
                 # Extract sources and clean response
-                clean_response, sources = self._extract_sources_from_response(result["answer"])
+                # Handle both string responses and dict responses
+                if isinstance(result, dict):
+                    response_text = result.get("answer", str(result))
+                elif hasattr(result, 'content'):
+                    response_text = result.content
+                else:
+                    response_text = str(result)
+
+                clean_response, sources = self._extract_sources_from_response(response_text)
                 
                 # Create response message with clean text
                 response = AIMessage(content=clean_response)
@@ -1113,9 +1159,17 @@ Content: {content}
                 "input": question,
                 "chat_history": chat_history
             })
-            
+
             # Extract sources and get clean response
-            clean_response, sources = self._extract_sources_from_response(rag_result["answer"])
+            # Handle both string responses and dict responses
+            if isinstance(rag_result, dict):
+                response_text = rag_result.get("answer", str(rag_result))
+            elif hasattr(rag_result, 'content'):
+                response_text = rag_result.content
+            else:
+                response_text = str(rag_result)
+
+            clean_response, sources = self._extract_sources_from_response(response_text)
             
             # FALLBACK: If no sources extracted from response, get them from retrieved docs
             if not sources and retrieved_docs:
