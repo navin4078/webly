@@ -910,7 +910,15 @@ Context pieces with sources:
             """Format documents as context for the prompt"""
             formatted_docs = []
             for doc in docs:
-                formatted_docs.append(f"Source: {doc.metadata.get('source', 'Unknown')}\n{doc.page_content}")
+                # Handle both Document objects and strings
+                if isinstance(doc, str):
+                    formatted_docs.append(f"Source: Unknown\n{doc}")
+                elif hasattr(doc, 'metadata') and hasattr(doc, 'page_content'):
+                    source = doc.metadata.get('source', 'Unknown') if isinstance(doc.metadata, dict) else 'Unknown'
+                    formatted_docs.append(f"Source: {source}\n{doc.page_content}")
+                else:
+                    # Try to convert to string
+                    formatted_docs.append(f"Source: Unknown\n{str(doc)}")
             return "\n\n".join(formatted_docs)
 
         self.question_answer_chain = (
@@ -939,11 +947,22 @@ Context pieces with sources:
     def _format_context_with_sources(self, retrieved_docs):
         """Format retrieved documents with source information for citations"""
         formatted_context = []
-        
+
         for i, doc in enumerate(retrieved_docs, 1):
-            source_url = doc.metadata.get('source', 'Unknown source')
-            title = doc.metadata.get('title', f'Page {i}')
-            content = doc.page_content
+            # Handle both Document objects and other types
+            if isinstance(doc, str):
+                # If it's a string, use it as content
+                source_url = 'Unknown source'
+                title = f'Page {i}'
+                content = doc
+            elif hasattr(doc, 'metadata') and hasattr(doc, 'page_content'):
+                # It's a Document object
+                source_url = doc.metadata.get('source', 'Unknown source') if isinstance(doc.metadata, dict) else 'Unknown source'
+                title = doc.metadata.get('title', f'Page {i}') if isinstance(doc.metadata, dict) else f'Page {i}'
+                content = doc.page_content
+            else:
+                # Unknown type, skip
+                continue
             
             # Create formatted context with source info
             context_piece = f"""
@@ -1176,10 +1195,16 @@ Content: {content}
                 print(f"🚑 DEBUG - No sources in response, extracting from docs...")
                 fallback_sources = []
                 for i, doc in enumerate(retrieved_docs):
-                    source_url = doc.metadata.get('source', '')
-                    title = doc.metadata.get('title', f'Document {i+1}')
-                    if source_url:
-                        fallback_sources.append({'title': title, 'url': source_url})
+                    # Handle both Document objects and other types
+                    if hasattr(doc, 'metadata') and isinstance(doc.metadata, dict):
+                        source_url = doc.metadata.get('source', '')
+                        title = doc.metadata.get('title', f'Document {i+1}')
+                        if source_url:
+                            fallback_sources.append({'title': title, 'url': source_url})
+                    elif isinstance(doc, str):
+                        # If it's a string, skip it (shouldn't happen but handle gracefully)
+                        print(f"⚠️ DEBUG - Found string in retrieved docs: {doc[:50]}...")
+                        continue
                 
                 # Remove duplicates
                 seen_urls = set()
